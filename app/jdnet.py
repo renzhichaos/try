@@ -15,24 +15,31 @@ def get_img_ids(page, max_page):
             fw.writelines("<body>\n<div>\n")
             url = "http://jandan.net/pic/page-" + str(page) + "#comments"
             browser.get(url)
-            time.sleep(10)
+            time.sleep(3)
             state = "complete"
-            while browser.execute_script("return document.readyState") == state:
+            j = 0
+            while browser.execute_script("return document.readyState") != state:
+                print(browser.execute_script("return document.readyState"))
+                if j < 20:
+                    time.sleep(3)
+                else:
+                    break
+                j = j + 1
+            else:
                 elements = browser.find_elements_by_xpath("//a[@class='view_img_link']")
                 for element in elements:
                     ids.append(element.get_property("href"))
                     fw.writelines("<p><img src='"+element.get_property("href")+"'></p>\n")
-                if len(ids) == 0:
-                    state = "complete"
-                    browser.get(url)
-                else:
-                    state = "over"
+
             print("第"+str(page)+"页", str(len(ids))+"个图片", ids)
             fw.writelines("</div>\n")
             fw.writelines("</body>\n")
             fw.writelines("</html>")
             fw.close()
-            page = page + 1
+            if len(ids) == 0:
+                page = page
+            else:
+                page = page + 1
     except BaseException:
         print("Exception")
     finally:

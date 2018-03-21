@@ -17,10 +17,14 @@ def get_img_ids(page, max_page):
             browser.get(url)
             time.sleep(3)
             state = "complete"
-
+            j = 0
             while browser.execute_script("return document.readyState") != state:
                 print(browser.execute_script("return document.readyState"))
-                time.sleep(3)
+                if j < 20:
+                    time.sleep(3)
+                else:
+                    break
+                j = j + 1
             else:
                 elements = browser.find_elements_by_xpath("//a[@class='view_img_link']")
                 for element in elements:
